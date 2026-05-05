@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Image, ImageSourcePropType, View } from "react-native";
+import { Image, ImageSourcePropType, View, Platform } from "react-native";
 
 import { icons } from "@/constants";
 
@@ -10,18 +10,21 @@ const TabIcon = ({
   source: ImageSourcePropType;
   focused: boolean;
 }) => (
-  <View
-    className={`flex flex-row justify-center items-center rounded-full ${focused ? "bg-general-300" : ""}`}
-  >
+  // ĐÂY LÀ CHÌA KHÓA: Đẩy thẳng icon xuống 15px (hoặc 10px trên Android) để ép nó vào giữa khung 78px
+  <View style={{ top: Platform.OS === "ios" ? 15 : 10 }}>
     <View
-      className={`rounded-full w-12 h-12 items-center justify-center ${focused ? "bg-general-400" : ""}`}
+      className={`flex flex-row justify-center items-center rounded-full ${focused ? "bg-general-300" : ""}`}
     >
-      <Image
-        source={source}
-        tintColor="white"
-        resizeMode="contain"
-        className="w-7 h-7"
-      />
+      <View
+        className={`rounded-full w-12 h-12 items-center justify-center ${focused ? "bg-general-400" : ""}`}
+      >
+        <Image
+          source={source}
+          tintColor="white"
+          resizeMode="contain"
+          className="w-7 h-7"
+        />
+      </View>
     </View>
   </View>
 );
@@ -29,7 +32,7 @@ const TabIcon = ({
 export default function Layout() {
   return (
     <Tabs
-      initialRouteName="index"
+      initialRouteName="home"
       screenOptions={{
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "white",
@@ -37,16 +40,13 @@ export default function Layout() {
         tabBarStyle: {
           backgroundColor: "#333333",
           borderRadius: 50,
-          paddingBottom: 0, // ios only
-          overflow: "hidden",
+          paddingBottom: 0,
           marginHorizontal: 20,
           marginBottom: 20,
           height: 78,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexDirection: "row",
           position: "absolute",
+          overflow: "hidden",
+          // Không còn bất kỳ flex, justify hay safeArea nào ở đây để tránh lỗi
         },
       }}
     >

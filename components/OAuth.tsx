@@ -12,12 +12,14 @@ const OAuth = () => {
   const handleGoogleSignIn = async () => {
     const result = await googleOAuth(startOAuthFlow);
 
-    if (result.code === "session_exists") {
-      Alert.alert("Success", "Session exists. Redirecting to home screen.");
+    // Nếu đăng nhập thành công (bất kể là session mới hay cũ)
+    if (result.success) {
+      // Xóa Alert nếu bạn muốn chuyển hướng mượt mà, không cần nhấn OK
       router.replace("/(root)/(tabs)/home");
+    } else {
+      // Chỉ hiện Alert khi có lỗi thực sự
+      Alert.alert("Error", result.message);
     }
-
-    Alert.alert(result.success ? "Success" : "Error", result.message);
   };
 
   return (

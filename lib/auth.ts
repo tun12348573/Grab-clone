@@ -31,14 +31,16 @@ export const tokenCache = {
 export const googleOAuth = async (startOAuthFlow: any) => {
   try {
     const { createdSessionId, setActive, signUp } = await startOAuthFlow({
-      redirectUrl: Linking.createURL("/(root)/(tabs)/home"),
+      // Thêm scheme vào đây để đảm bảo iOS redirect chuẩn xác
+      redirectUrl: Linking.createURL("/(root)/(tabs)/home", { scheme: "uber" }),
     });
 
     if (createdSessionId) {
       if (setActive) {
         await setActive({ session: createdSessionId });
 
-        if (signUp.createdUserId) {
+        // Dùng dấu ?. để tránh crash nếu signUp không tồn tại (trường hợp Sign In)
+        if (signUp?.createdUserId) {
           await fetchAPI("/(api)/user", {
             method: "POST",
             body: JSON.stringify({
@@ -51,7 +53,7 @@ export const googleOAuth = async (startOAuthFlow: any) => {
 
         return {
           success: true,
-          code: "success",
+          code: "success", // Code này sẽ được OAuth.tsx nhận
           message: "You have successfully signed in with Google",
         };
       }
@@ -62,11 +64,11 @@ export const googleOAuth = async (startOAuthFlow: any) => {
       message: "An error occurred while signing in with Google",
     };
   } catch (err: any) {
-    console.error(err);
+    console.error("Google OAuth Error:", err);
     return {
       success: false,
       code: err.code,
-      message: err?.errors[0]?.longMessage,
+      message: err?.errors?.[0]?.longMessage || "Authentication failed",
     };
   }
 };
